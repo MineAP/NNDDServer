@@ -91,19 +91,33 @@ public class GetVideoList extends HttpServlet
 				if (type == null || TYPE_XML.equals(type.toUpperCase()))
 				{
 				
-					writeXML(request, response, out);
+					writeXML(request, response, out, -1);
 					
 				}
 				else if (TYPE_HTML.equals(type.toUpperCase()))
 				{
 					
-					writeHTML(request, response, out);
+					writeHTML(request, response, out, -1);
 					
 				}
 				
 			} else
 			{
 				
+				long id = Long.parseLong(target);
+				
+				if (type == null || TYPE_XML.equals(type.toUpperCase()))
+				{
+				
+					writeXML(request, response, out, id);
+					
+				}
+				else if (TYPE_HTML.equals(type.toUpperCase()))
+				{
+					
+					writeHTML(request, response, out, id);
+					
+				}
 				
 			}
 
@@ -121,13 +135,20 @@ public class GetVideoList extends HttpServlet
 	 * @throws IOException 
 	 */
 	public void writeXML(HttpServletRequest request,
-			HttpServletResponse response, PrintWriter out) throws IOException
+			HttpServletResponse response, PrintWriter out, long rootId) throws IOException
 	{
 		NNDDVideoDao dao = new NNDDVideoDao();
 		try
 		{
 			
-			List<NNDDVideo> allNNDDVideo = dao.getAllNNDDVideo();
+			List<NNDDVideo> videoList = null;
+			if (rootId == -1)
+			{
+				videoList = dao.getAllNNDDVideo();
+			} else if (rootId > -1)
+			{
+				videoList = dao.getNNDDVideoByFileId(rootId);
+			}
 			
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
@@ -157,7 +178,7 @@ public class GetVideoList extends HttpServlet
 			
 			CreateVideoElement createVideoElement = new CreateVideoElement();
 			int count = 1;
-			for (NNDDVideo nnddVideo : allNNDDVideo)
+			for (NNDDVideo nnddVideo : videoList)
 			{
 				
 				Element item = createVideoElement.createElement(document, nnddVideo, count);
@@ -196,7 +217,7 @@ public class GetVideoList extends HttpServlet
 	 * @throws IOException 
 	 */
 	public void writeHTML(HttpServletRequest request,
-			HttpServletResponse response, PrintWriter out) throws IOException
+			HttpServletResponse response, PrintWriter out, long rootId) throws IOException
 	{
 		NNDDVideoDao dao = new NNDDVideoDao();
 		try
@@ -206,25 +227,41 @@ public class GetVideoList extends HttpServlet
 
 			out.println("<title>“®‰æˆê——</title>");
 			out.println("<body>");
-			
-			List<NNDDVideo> allNNDDVideo = dao.getAllNNDDVideo();
-			
-			for (NNDDVideo nnddVideo : allNNDDVideo)
+
+			List<NNDDVideo> videoList = null;
+			if (rootId == -1)
 			{
-				
-				String str = "<a href=\"<URL>\"><VIDEO_NAME></a><br />";
-				
-				str = str.replace("<URL>", "http://" + request.getLocalAddr() + ":" + request.getLocalPort() + "/NNDDServer/videostream/" +  nnddVideo.getKey());
-				str = str.replace("<VIDEO_NAME>", nnddVideo.getVideoName());
-				
-				out.println(str + "\n");
-				
+				videoList = dao.getAllNNDDVideo();
+			} else if (rootId > -1)
+			{
+				videoList = dao.getNNDDVideoByFileId(rootId);
 			}
-			
-			if (allNNDDVideo.isEmpty())
+
+			if (videoList == null || videoList.isEmpty())
 			{
 				out.println("not found.");
+			} else
+			{
+
+				for (NNDDVideo nnddVideo : videoList)
+				{
+
+					String str = "<a href=\"<URL>\"><VIDEO_NAME></a><br />";
+
+					str = str.replace(
+							"<URL>",
+							"http://" + request.getLocalAddr() + ":"
+									+ request.getLocalPort()
+									+ "/NNDDServer/videostream/"
+									+ nnddVideo.getKey());
+					str = str.replace("<VIDEO_NAME>", nnddVideo.getVideoName());
+
+					out.println(str + "\n");
+
+				}
+
 			}
+
 			out.println("</body>");
 			
 			out.println("</html>");

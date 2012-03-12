@@ -8,6 +8,7 @@
     	<title>NNDD Server</title>
   </head>
   <body>
-    <a href="./api/getvideolist?type=html">動画の一覧</a>
+    <a href="./api/getvideolist?type=html">動画の一覧</a><br />
+    <a href="./api/getdirlist?type=html">ディレクトリの一覧</a><br />
   </body>
 </html> 

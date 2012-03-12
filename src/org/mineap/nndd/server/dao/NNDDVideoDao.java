@@ -4,6 +4,7 @@
  */
 package org.mineap.nndd.server.dao;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +14,7 @@ import java.util.Date;
 import org.mineap.nndd.server.model.NNDDVideo;
 
 /**
- *
+ * 
  * @author shiraminekeisuke(MineAP)
  */
 public class NNDDVideoDao
@@ -39,7 +40,8 @@ public class NNDDVideoDao
 
 			statement.setQueryTimeout(30);
 
-			ResultSet rs = statement.executeQuery("select * from nnddvideo where id = " + id);
+			ResultSet rs = statement
+					.executeQuery("select * from nnddvideo where id = " + id);
 
 			if (rs.next())
 			{
@@ -49,8 +51,10 @@ public class NNDDVideoDao
 				return null;
 			}
 
-
 		} catch (ClassNotFoundException e)
+		{
+			throw new RuntimeException(e);
+		} catch (IOException e)
 		{
 			throw new RuntimeException(e);
 		} finally
@@ -87,7 +91,9 @@ public class NNDDVideoDao
 
 			statement.setQueryTimeout(30);
 
-			ResultSet rs = statement.executeQuery("select * from nnddvideo where key like '" + key + "'");
+			ResultSet rs = statement
+					.executeQuery("select * from nnddvideo where key like '"
+							+ key + "'");
 
 			if (rs.next())
 			{
@@ -97,8 +103,10 @@ public class NNDDVideoDao
 				return null;
 			}
 
-
 		} catch (ClassNotFoundException e)
+		{
+			throw new RuntimeException(e);
+		} catch (IOException e)
 		{
 			throw new RuntimeException(e);
 		} finally
@@ -116,8 +124,65 @@ public class NNDDVideoDao
 	}
 
 	/**
+	 * 
+	 * 
+	 * @param dirId
+	 * @return
+	 * @throws SQLException
+	 */
+	public ArrayList<NNDDVideo> getNNDDVideoByFileId(long dirId)
+			throws SQLException
+	{
+		Connection connection = null;
+
+		Statement statement = null;
+
+		try
+		{
+			connection = SqlConnectionManager.getInstance().createConnection();
+
+			statement = connection.createStatement();
+
+			statement.setQueryTimeout(30);
+
+			ResultSet rs = statement
+					.executeQuery("select * from nnddvideo where dirPath_id = "
+							+ dirId);
+
+			ArrayList<NNDDVideo> videos = new ArrayList<NNDDVideo>();
+
+			while (rs.next())
+			{
+				videos.add(createByResultSet(rs));
+			}
+
+			return videos;
+
+		} catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} finally
+		{
+			if (connection != null)
+			{
+				try
+				{
+					connection.close();
+				} catch (SQLException e)
+				{
+				}
+			}
+		}
+	}
+
+	/**
 	 * 全ての {@link NNDDVideo} オブジェクトを探して返します。
-	 *
+	 * 
 	 * @return
 	 * @throws SQLException
 	 */
@@ -149,6 +214,11 @@ public class NNDDVideoDao
 
 		} catch (ClassNotFoundException e)
 		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (IOException e)
+		{
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		} finally
 		{
@@ -165,12 +235,13 @@ public class NNDDVideoDao
 	}
 
 	/**
-	 *
+	 * 
 	 * @param resultSet
 	 * @return
 	 * @throws SQLException
 	 */
-	private NNDDVideo createByResultSet(ResultSet resultSet) throws SQLException
+	private NNDDVideo createByResultSet(ResultSet resultSet)
+			throws SQLException
 	{
 		NNDDVideo nnddVideo = new NNDDVideo();
 
@@ -184,7 +255,7 @@ public class NNDDVideoDao
 		String thumbUrl = resultSet.getString("thumbUrl");
 		long playCount = resultSet.getLong("playCount");
 		long time = resultSet.getLong("time");
-		long lastPlayDate = (long)resultSet.getDouble("lastPlayDate");
+		long lastPlayDate = (long) resultSet.getDouble("lastPlayDate");
 		boolean yetReading = resultSet.getBoolean("yetReading");
 
 		nnddVideo.setId(id);
