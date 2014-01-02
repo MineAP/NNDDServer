@@ -49,4 +49,5 @@
     <servlet-name>VideoStream</servlet-name>
     <url-pattern>/videostream/*</url-pattern>
   </servlet-mapping>
+  
 </web-app>

@@ -248,12 +248,20 @@ public class GetVideoList extends HttpServlet
 
 					String str = "<a href=\"<URL>\"><VIDEO_NAME></a><br />";
 
+//					str = str.replace(
+//							"<URL>",
+//							"http://" + request.getLocalName() + ":"
+//									+ request.getLocalPort()
+//									+ "/NNDDServer/videostream/"
+//									+ nnddVideo.getKey());
+					
 					str = str.replace(
 							"<URL>",
-							"http://" + request.getLocalAddr() + ":"
+							"http://" + request.getLocalName() + ":"
 									+ request.getLocalPort()
-									+ "/NNDDServer/videostream/"
+									+ "/NNDDServer/WatchPage.jsp?videoid="
 									+ nnddVideo.getKey());
+					
 					str = str.replace("<VIDEO_NAME>", nnddVideo.getVideoName());
 
 					out.println(str + "\n");

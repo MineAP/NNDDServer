@@ -1,6 +1,5 @@
 package org.mineap.nndd.server.api.getdirlist;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -14,50 +13,57 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.mineap.nndd.server.dao.NNDDFileDao;
-import org.mineap.nndd.server.dao.NNDDVideoDao;
 import org.mineap.nndd.server.model.NNDDFile;
-import org.mineap.nndd.server.model.NNDDVideo;
 
 /**
  * Servlet implementation class GetDirList
  */
 @WebServlet("/api/getdirlist")
-public class GetDirList extends HttpServlet {
+public class GetDirList extends HttpServlet
+{
 	private static final long serialVersionUID = 1L;
-       
+
 	private static final String TYPE_XML = "XML";
-	
+
 	private static final String TYPE_HTML = "HTML";
-	
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public GetDirList() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public GetDirList()
+	{
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException
+	{
 		processRequest(request, response);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException
+	{
 		processRequest(request, response);
 	}
-	
+
 	/**
 	 * @param request
 	 * @param response
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	private void processRequest(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException
 	{
 
 		response.setContentType("text/html;charset=UTF-8");
@@ -74,9 +80,9 @@ public class GetDirList extends HttpServlet {
 
 				if (type == null || TYPE_XML.equals(type.toUpperCase()))
 				{
-					
+
 					throw new UnsupportedOperationException();
-					
+
 				} else if (TYPE_HTML.equals(type.toUpperCase()))
 				{
 					writeHTML(request, response, out);
@@ -91,9 +97,9 @@ public class GetDirList extends HttpServlet {
 		{
 			out.close();
 		}
-		
+
 	}
-	
+
 	/**
 	 * @param request
 	 * @param response
@@ -111,31 +117,32 @@ public class GetDirList extends HttpServlet {
 
 			out.println("<title>ディレクトリ一覧</title>");
 			out.println("<body>");
-			
+
 			List<NNDDFile> dirList = dao.getAllDir();
-			
+
 			for (NNDDFile file : dirList)
 			{
-				
+
 				String str = "<a href=\"<URL>\"><DIR_NAME></a><br />";
-				
-				str = str.replace("<URL>", "http://" + request.getLocalAddr() + ":" + request.getLocalPort() + "/NNDDServer/api/getvideolist?target=" + file.getId() + "&type=html");
+
+				str = str.replace("<URL>", "http://" + request.getLocalName()
+						+ ":" + request.getLocalPort()
+						+ "/NNDDServer/api/getvideolist?target=" + file.getId()
+						+ "&type=html");
 				str = str.replace("<DIR_NAME>", file.getFile().getName());
-				
+
 				out.println(str + "\n");
-				
+
 			}
-			
+
 			if (dirList.isEmpty())
 			{
 				out.println("not found.");
 			}
 			out.println("</body>");
-			
+
 			out.println("</html>");
-			
-			
-			
+
 		} catch (SQLException e)
 		{
 			response.sendError(HttpsURLConnection.HTTP_INTERNAL_ERROR);

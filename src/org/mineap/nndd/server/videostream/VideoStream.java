@@ -93,7 +93,7 @@ public class VideoStream extends HttpServlet
 			} else
 			{
 				Logger.getLogger(VideoStream.class.getName()).log(Level.INFO,
-						"file:" + file.getName());
+						"file:" + file.getAbsolutePath());
 			}
 			
 			String extension = "flv";
@@ -110,7 +110,7 @@ public class VideoStream extends HttpServlet
 			try
 			{
 
-				bis = new BufferedInputStream(new FileInputStream(file));
+				bis = new BufferedInputStream(new FileInputStream(file.getAbsoluteFile()));
 
 				if (extension.indexOf("flv") != -1)
 				{
@@ -135,7 +135,10 @@ public class VideoStream extends HttpServlet
 				while ((len = bis.read(buffer)) != -1)
 				{
 					outputStream.write(buffer, 0, len);
+					outputStream.flush();
 				}
+				
+				System.out.println("complete.");
 
 			} finally
 			{
